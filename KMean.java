@@ -1,6 +1,5 @@
-import java.util.HashMap;
-import java.util.Map;
 import java.util.Random;
+import java.util.Scanner;
 
 public class KMean {
 
@@ -10,7 +9,9 @@ public class KMean {
         public int label;
         public double distance;   
         
-        public Point(){
+        public Point(double x, double y){
+            Xcoord = x; 
+            YCoord = y;
             label = 0;
             distance = 99999.00;
         }
@@ -41,24 +42,37 @@ public class KMean {
 
         KCentroidAry = new Point[k+1];
 
-
         checkIfPrior = new Boolean[numPts];
 
         for(int i = 0; i < numPts; i++){
             checkIfPrior[i] = false;
         }
 
-
         change = 0;
     }
 
-    public void loadPointSet(){
+    public void loadPointSet(Scanner scanner){
+        double x = 0.0;
+        double y = 0.0;
+
+        for(int i = 0; i < numPts; i++){
+            if(scanner.hasNextDouble()){
+                x = scanner.nextDouble();
+                if(scanner.hasNextDouble()){
+                    y = scanner.nextDouble();
+                    pointSet[i] = new Point(x, y);
+                }
+            }
+        }
 
     }
 
     public void kMeansClustering(){
-        //int iteration = 0;
+        int iteration = 0;
         selectKCentroids();
+
+        int index = 0;
+
 
     }
 
@@ -77,10 +91,10 @@ public class KMean {
             }
             Kcnt++;
 
-            KCentroidAry[Kcnt].Xcoord = pointSet[index].Xcoord;
-            KCentroidAry[Kcnt].YCoord = pointSet[index].YCoord;
-            KCentroidAry[Kcnt].label = Kcnt;
-            KCentroidAry[Kcnt].distance = 0.0;
+            // KCentroidAry[Kcnt].Xcoord = pointSet[index].Xcoord;
+            // KCentroidAry[Kcnt].YCoord = pointSet[index].YCoord;
+            // KCentroidAry[Kcnt].label = Kcnt;
+            // KCentroidAry[Kcnt].distance = 0.0;
         }
 
     
@@ -90,10 +104,27 @@ public class KMean {
 
         if(checkIfPrior[index] == true){
             return true;
-        }else{  //that means we haven't check it before so set it equal to true
+        }else{  // means we haven't check it before so set it equal to true
             checkIfPrior[index] = true;
             return false;
         }
+    }
+
+    public void PlotDisplayAry(Point pSet[],int display[][]){
+        //for each point i, in pointSet, plot the pointSet[i].Label
+        // onto the displayAry at the location of pointSet[i]’s Xcoord and //Ycoord; need to convert pointSet[i]’s
+        // Xcoord and Ycoord to integer //to get the 2D coordinates
+
+        for(int i = 0; i < numPts; i++){
+            int x = (int)pointSet[i].Xcoord;
+            int y = (int)pointSet[i].YCoord;
+            display[x][y] = pointSet[i].label;
+        }
+    }
+
+    public void PrettyPrint(int display[][], int iteration){//include the outFile
+
+
     }
 
     

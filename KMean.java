@@ -1,3 +1,6 @@
+import java.io.FileWriter;
+import java.io.IOException;
+import java.io.PrintWriter;
 import java.util.Random;
 import java.util.Scanner;
 
@@ -42,6 +45,10 @@ public class KMean {
 
         KCentroidAry = new Point[k+1];
 
+        for(int i = 0; i < k + 1; i++){
+            KCentroidAry[i] = new Point(0.0, 0.0);
+        }
+
         checkIfPrior = new Boolean[numPts];
 
         for(int i = 0; i < numPts; i++){
@@ -67,13 +74,29 @@ public class KMean {
 
     }
 
-    public void kMeansClustering(){
+    public void kMeansClustering() throws IOException{
+        String fileName = "outFile1";
         int iteration = 0;
         selectKCentroids();
 
         int index = 0;
+        iteration++;
+
+        PlotDisplayAry();
+        PrettyPrint(fileName, iteration);
+        Point pt = pointSet[index];
+        double minDist = pointSet[index].distance;
 
 
+
+
+    }
+
+    public void DistanceMinLabel(Point pt, Point kCentroid[], double minDist){
+        // compute the distance from a point pt to each of the K centroids. The method returns minLable
+        // This algorithm may contain bugs, debugging is yours
+
+        
     }
 
     public void selectKCentroids(){
@@ -91,10 +114,12 @@ public class KMean {
             }
             Kcnt++;
 
-            // KCentroidAry[Kcnt].Xcoord = pointSet[index].Xcoord;
-            // KCentroidAry[Kcnt].YCoord = pointSet[index].YCoord;
-            // KCentroidAry[Kcnt].label = Kcnt;
-            // KCentroidAry[Kcnt].distance = 0.0;
+            System.out.println(index);
+
+            KCentroidAry[Kcnt].Xcoord = pointSet[index].Xcoord;
+            KCentroidAry[Kcnt].YCoord = pointSet[index].YCoord;
+            KCentroidAry[Kcnt].label = Kcnt;
+            KCentroidAry[Kcnt].distance = 0.0;
         }
 
     
@@ -110,7 +135,7 @@ public class KMean {
         }
     }
 
-    public void PlotDisplayAry(Point pSet[],int display[][]){
+    public void PlotDisplayAry(){
         //for each point i, in pointSet, plot the pointSet[i].Label
         // onto the displayAry at the location of pointSet[i]’s Xcoord and //Ycoord; need to convert pointSet[i]’s
         // Xcoord and Ycoord to integer //to get the 2D coordinates
@@ -118,13 +143,36 @@ public class KMean {
         for(int i = 0; i < numPts; i++){
             int x = (int)pointSet[i].Xcoord;
             int y = (int)pointSet[i].YCoord;
-            display[x][y] = pointSet[i].label;
+            displayAry[x][y] = pointSet[i].label;
         }
     }
 
-    public void PrettyPrint(int display[][], int iteration){//include the outFile
+    public void PrettyPrint(String fileName, int iteration) throws IOException{//include the outFile
+        PrintWriter writer = new PrintWriter(new FileWriter(fileName,true));
+        writer.write("***Result of iteration " + iteration + " ***");
+
+        for(int i = 0; i < numRows; i++){
+            for(int j = 0; j < numCols; j++){
+                if(displayAry[i][j] > 1){
+                    writer.write(displayAry[i][j] + " ");
+                }else{
+                    writer.write(" ");
+                }
+            }
+        }
+
+        writer.close();
 
 
+    }
+
+    public void print(){
+        for(int i = 0; i < numRows; i++){
+            for(int j = 0; j < numCols; j++){
+                System.out.print(displayAry[i][j] + " ");
+            }
+            System.out.println();
+        }
     }
 
     

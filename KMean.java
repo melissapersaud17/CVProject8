@@ -77,26 +77,114 @@ public class KMean {
     public void kMeansClustering() throws IOException{
         String fileName = "outFile1";
         int iteration = 0;
+
         selectKCentroids();
 
-        int index = 0;
-        iteration++;
+        change = 2;
 
-        PlotDisplayAry();
-        PrettyPrint(fileName, iteration);
-        Point pt = pointSet[index];
-        double minDist = pointSet[index].distance;
+        while(change >= 2){
+            int index = 0;
+            iteration++;
+    
+            PlotDisplayAry();
+            PrettyPrint(fileName, iteration);
+    
+            change = 0;
+    
+            while(index < numPts){ // numpts = 399
+                Point pt = pointSet[index]; //gets the first point 41 56
+                double minDist = pointSet[index].distance;  // by default distance should be 99999.00
+        
+                int minLabel = DistanceMinLabel(pt, KCentroidAry, minDist);
+        
+                if(pointSet[index].label != minLabel){
+                    pointSet[index].label = minLabel;
+                    // System.out.println(pointSet[index].label);
+                    pointSet[index].distance = minDist;
+                    change++;
+                }
+                index++;
+            }
 
+            if(change > 2){
+                computeCentroids();                
+            }
+        }
+
+    
 
 
 
     }
 
-    public void DistanceMinLabel(Point pt, Point kCentroid[], double minDist){
+    public void computeCentroids(){
+        double sumX[] = new double[k+1];
+        double sumY[] = new double[k+1];
+        int totalPt[] = new int[k+1];
+
+        for(int i = 0; i < k+1; i++){
+            sumX[i] = 0.0;
+            sumY[i] = 0.0;
+            totalPt[i] = 0;
+        }
+
+        int index = 0;
+        
+        while(index < numPts){
+            int label = pointSet[index].label;
+            sumX[label] += pointSet[index].Xcoord;
+            sumY[label] += pointSet[index].YCoord;
+            totalPt[label]++;
+            index++;
+        }
+
+        int label = 1;
+        while(label < k){
+            if(totalPt[label] > 0.0){
+                KCentroidAry[label].Xcoord = sumX[label]/totalPt[label];
+                KCentroidAry[label].YCoord = sumY[label]/totalPt[label];
+            }
+            label++;
+        }
+    }
+
+    public int DistanceMinLabel(Point pt, Point kCentroid[], double minDist){
         // compute the distance from a point pt to each of the K centroids. The method returns minLable
         // This algorithm may contain bugs, debugging is yours
 
+        int minLabel = 0;
+        int label = 1;
         
+        while(label <= k){
+            Point whichCentroid = KCentroidAry[label];
+            double dist = computeDistance(pt, whichCentroid);
+
+            // System.out.println("distance is " + dist);
+    
+            if(dist < minDist){
+                minLabel = label;
+                minDist = dist;
+            }
+            label++;
+        }
+        return minLabel;
+    }
+
+    public double computeDistance(Point pt, Point whichCentroid){
+        //compute the distance between these two points using their x and y values
+
+        //lets say the coordinates for pt is (x1,y1)
+        //the coordinates for whichCentroid is (x2,y2)
+        double xVal = whichCentroid.Xcoord - pt.Xcoord;
+        xVal = Math.pow(xVal, 2);
+        double yVal = whichCentroid.YCoord - pt.YCoord;
+        yVal = Math.pow(yVal, 2);
+
+        double distance = xVal + yVal;
+        distance = Math.sqrt(distance);
+
+        return distance;
+
     }
 
     public void selectKCentroids(){
@@ -114,12 +202,16 @@ public class KMean {
             }
             Kcnt++;
 
-            System.out.println(index);
+            // System.out.println("k cluster is " + index);
 
             KCentroidAry[Kcnt].Xcoord = pointSet[index].Xcoord;
             KCentroidAry[Kcnt].YCoord = pointSet[index].YCoord;
             KCentroidAry[Kcnt].label = Kcnt;
             KCentroidAry[Kcnt].distance = 0.0;
+            // System.out.println("xcoord is " + KCentroidAry[Kcnt].Xcoord );
+            // System.out.println("ycoord is " + KCentroidAry[Kcnt].YCoord);
+
+
         }
 
     
@@ -144,21 +236,31 @@ public class KMean {
             int x = (int)pointSet[i].Xcoord;
             int y = (int)pointSet[i].YCoord;
             displayAry[x][y] = pointSet[i].label;
+            // System.out.println(x + " " + y);
+
         }
     }
 
     public void PrettyPrint(String fileName, int iteration) throws IOException{//include the outFile
         PrintWriter writer = new PrintWriter(new FileWriter(fileName,true));
-        writer.write("***Result of iteration " + iteration + " ***");
+
+        writer.println("***Result of iteration " + iteration + " ***");
+        //this will be different depending on the K value
+        writer.println("Centroid A: " + KCentroidAry[1].Xcoord + " " + KCentroidAry[1].YCoord);
+        writer.println("Centroid B: " + KCentroidAry[2].Xcoord + " " + KCentroidAry[2].YCoord);
+        writer.println("Centroid C: " + KCentroidAry[3].Xcoord + " " + KCentroidAry[3].YCoord);
+
+        writer.println();
 
         for(int i = 0; i < numRows; i++){
             for(int j = 0; j < numCols; j++){
-                if(displayAry[i][j] > 1){
+                if(displayAry[i][j] >= 1){
                     writer.write(displayAry[i][j] + " ");
                 }else{
                     writer.write(" ");
                 }
             }
+            writer.println();
         }
 
         writer.close();
